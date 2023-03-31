@@ -1,0 +1,15 @@
+version: "3"
+services:
+    whitelist:
+        build: .
+        container_name: whitelist
+        cap_add:
+            - NET_ADMIN
+
+        ports:
+            - 800:80
+            # - 443:443
+    nginx:
+        image: nginx:alpine
+        container_name: nginx_test
+        network_mode: service:whitelist
