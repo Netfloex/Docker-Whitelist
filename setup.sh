@@ -1,5 +1,5 @@
 #!/bin/bash
-
+PORTS=(80 443)
 CLOUDFLARE_URL="https://www.cloudflare.com/ips-v4"
 
 
@@ -9,14 +9,16 @@ CLOUDFLARE_IPS=$(wget -qO- "$CLOUDFLARE_URL")
 
 # Whitelist
 for ip in $CLOUDFLARE_IPS; do
-    iptables -A INPUT -p tcp -s $ip --dport 80 -j ACCEPT
-    iptables -A INPUT -p tcp -s $ip --dport 443 -j ACCEPT
+    for port in "${PORTS[@]}"; do
+        iptables -A INPUT -p tcp -s $ip --dport $port -j ACCEPT
+    done
 done
 
 
-# Deny all other ip adressess 
-iptables -A INPUT -p tcp --dport 80 -j DROP
-iptables -A INPUT -p tcp --dport 443 -j DROP
+# Deny all other ip adressess
+for port in "${PORTS[@]}"; do
+    iptables -A INPUT -p tcp --dport $port -j DROP
+done
 
 
 # Keep the container running
